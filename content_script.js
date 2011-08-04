@@ -5,8 +5,12 @@ var reviewbuddy = {};
  *****************************************************************************/
 
 reviewbuddy.config = {};
-reviewbuddy.config.crucibleBaseUrl = "http://sandbox.fisheye.atlassian.com";
-reviewbuddy.config.crucibleCreateReviewUrl = reviewbuddy.config.crucibleBaseUrl + "/json/cru/createReviewDialog";
+reviewbuddy.config.crucible = {};
+reviewbuddy.config.crucible.baseUrl = "http://sandbox.fisheye.atlassian.com";
+reviewbuddy.config.crucible.reviewBaseUrl = reviewbuddy.config.crucible.baseUrl + "/cru";
+reviewbuddy.config.crucible.jsonApi = reviewbuddy.config.crucible.baseUrl + "/json/cru";
+reviewbuddy.config.crucible.createReviewUrl = reviewbuddy.config.crucible.jsonApi + "/createReviewDialog";
+reviewbuddy.config.crucible.revisionAdd = "/editRevisionsAjax/";
 
 /*****************************************************************************
  * Implementation
@@ -45,7 +49,7 @@ reviewbuddy.getChangsets = function() {
  * Calls the callback, passing in the review id (if successful), or an empty string (on failure).
  */
 reviewbuddy.createReview = function(callback) {
-	$.post(reviewbuddy.config.crucibleCreateReviewUrl, function(data) { reviewbuddy.onReviewCreated(data, callback); });
+	$.post(reviewbuddy.config.crucible.createReviewUrl, function(data) { reviewbuddy.onReviewCreated(data, callback); });
 }
 
 /**
@@ -87,6 +91,20 @@ reviewbuddy.onReviewCreated = function(data, callback) {
 	callback(reviewbuddy.parseReviewId(data));
 }
 
+/**
+ * Given a review id, returns the URL that should be used to edit
+ * the revisions that are part of that review.
+ * 
+ * Returns an empty string if review id is null or empty.
+ */
+reviewbuddy.createRevisionEditUrl = function(reviewId) {
+	if(!reviewId) {
+		return "";
+	}
+	
+	return reviewbuddy.config.crucible.jsonApi + "/" + reviewId + reviewbuddy.config.crucible.revisionAdd;
+}
+
 reviewbuddy.startReviewCreation = function() {
 	var changesets = reviewbuddy.getChangsets();
 	
@@ -95,7 +113,44 @@ reviewbuddy.startReviewCreation = function() {
 		return;
 	}
 
-	reviewbuddy.createReview(function(reviewId) { alert("review id is " + reviewId); });
+	reviewbuddy.createReview(function(reviewId) { reviewbuddy.addChangesetsToReview(changesets, reviewId); });
+}
+
+/**
+ * Creates the data that we can send to Crucible in order to add a revision
+ * to a review.
+ */
+reviewbuddy.createRevisionAddData = function(changesetId) {
+	return "csid=" + changesetId + "&command=add";
+}
+
+/**
+ * Adds a single changeset to a review.
+ * 
+ * The revision edit URL is expected to already specify the review id.
+ */
+reviewbuddy.addChangesetToReview = function(revisionEditUrl, changesetId) {
+	var data = reviewbuddy.createRevisionAddData(changesetId);
+	$.post(revisionEditUrl, data, reviewbuddy.onRevisionAdded);
+}
+
+reviewbuddy.onRevisionAdded = function(data) {
+	alert(data);
+}
+
+/**
+ * Adds an array of changesets to a review.
+ */
+reviewbuddy.addChangesetsToReview = function(changesets, reviewId) {
+	if(!reviewId || !$.isArray(changesets)) {
+		return;
+	}
+	
+	var revisionEditUrl = reviewbuddy.createRevisionEditUrl(reviewId);
+	
+	for(changesetId in changesets) {
+		reviewbuddy.addChangesetToReview(revisionEditUrl, changesetId);
+	}
 }
 
 reviewbuddy.startReviewCreation();
