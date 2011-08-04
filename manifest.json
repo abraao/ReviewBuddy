@@ -1,0 +1,12 @@
+{
+	"name": "Review Buddy",
+	"version": "1.0",
+	"description": "Your Crucible and Fisheye companion.",
+	"background_page": "background.html",
+	"permissions": ["tabs", "http://*/*"],
+	"browser_action": {
+		"name": "Create a review",
+		"default_icon": "icon.png",
+		"default_title": "Review Buddy"
+	}
+}
