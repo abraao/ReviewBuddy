@@ -27,6 +27,15 @@ reviewbuddy.global.changesetsAdded = 0;
  */
 reviewbuddy.global.changesetsNum = 0;
 
+/**
+ * Reset the global to no changesets added, with the given number
+ * of changesets still to be added.
+ */
+reviewbuddy.global.resetState = function(changesetsNum) {
+	reviewbuddy.global.changesetsAdded = 0;
+	reviewbuddy.global.changesetsNum = changesetsNum;
+}
+
 /*****************************************************************************
  * Implementation
  *****************************************************************************/
@@ -180,12 +189,10 @@ reviewbuddy.addChangesetsToReview = function(changesets, reviewId) {
 	
 	var changesetEditUrl = reviewbuddy.createChangesetEditUrl(reviewId);
 	
-	// reset number of changesets added and to be added
-	reviewbuddy.global.changesetsAdded = 0;
-	reviewbuddy.global.changesetsNum = changesets.length;
+	reviewbuddy.global.resetState(changesets.length);
 	
-	for(changesetId in changesets) {
-		reviewbuddy.addChangesetToReview(changesetEditUrl, changesetId, reviewId);
+	for(ii in changesets) {
+		reviewbuddy.addChangesetToReview(changesetEditUrl, changesets[ii], reviewId);
 	}
 }
 
