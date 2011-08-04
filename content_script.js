@@ -13,6 +13,21 @@ reviewbuddy.config.crucible.createReviewUrl = reviewbuddy.config.crucible.jsonAp
 reviewbuddy.config.crucible.revisionAdd = "/editRevisionsAjax/";
 
 /*****************************************************************************
+ * Global values. ugh
+ *****************************************************************************/
+reviewbuddy.global = {};
+
+/**
+ * The number of changesets added to the review.
+ */
+reviewbuddy.global.changesetsAdded = 0;
+
+/**
+ * The number of changesets being added to the review.
+ */
+reviewbuddy.global.changesetsNum = 0;
+
+/*****************************************************************************
  * Implementation
  *****************************************************************************/
 
@@ -135,7 +150,11 @@ reviewbuddy.addChangesetToReview = function(revisionEditUrl, changesetId) {
 }
 
 reviewbuddy.onRevisionAdded = function(data) {
-	alert(data);
+	reviewbuddy.global.changesetsAdded++;
+	
+	if(reviewbuddy.global.changesetsAdded >= reviewbuddy.global.changesetsNum) {
+		alert("done!");
+	}
 }
 
 /**
@@ -147,6 +166,10 @@ reviewbuddy.addChangesetsToReview = function(changesets, reviewId) {
 	}
 	
 	var revisionEditUrl = reviewbuddy.createRevisionEditUrl(reviewId);
+	
+	// reset number of changesets added and to be added
+	reviewbuddy.global.changesetsAdded = 0;
+	reviewbuddy.global.changesetsNum = changesets.length;
 	
 	for(changesetId in changesets) {
 		reviewbuddy.addChangesetToReview(revisionEditUrl, changesetId);
