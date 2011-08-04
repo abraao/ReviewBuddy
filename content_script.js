@@ -10,7 +10,7 @@ reviewbuddy.config.crucible.baseUrl = "http://sandbox.fisheye.atlassian.com";
 reviewbuddy.config.crucible.reviewBaseUrl = reviewbuddy.config.crucible.baseUrl + "/cru";
 reviewbuddy.config.crucible.jsonApi = reviewbuddy.config.crucible.baseUrl + "/json/cru";
 reviewbuddy.config.crucible.createReviewUrl = reviewbuddy.config.crucible.jsonApi + "/createReviewDialog";
-reviewbuddy.config.crucible.revisionAdd = "/editRevisionsAjax/";
+reviewbuddy.config.crucible.changesetAdd = "/editRevisionsAjax/";
 
 /*****************************************************************************
  * Global values. ugh
@@ -108,16 +108,16 @@ reviewbuddy.onReviewCreated = function(data, callback) {
 
 /**
  * Given a review id, returns the URL that should be used to edit
- * the revisions that are part of that review.
+ * the changesets that are part of that review.
  * 
  * Returns an empty string if review id is null or empty.
  */
-reviewbuddy.createRevisionEditUrl = function(reviewId) {
+reviewbuddy.createChangesetEditUrl = function(reviewId) {
 	if(!reviewId) {
 		return "";
 	}
 	
-	return reviewbuddy.config.crucible.jsonApi + "/" + reviewId + reviewbuddy.config.crucible.revisionAdd;
+	return reviewbuddy.config.crucible.jsonApi + "/" + reviewId + reviewbuddy.config.crucible.changesetAdd;
 }
 
 reviewbuddy.startReviewCreation = function() {
@@ -132,29 +132,42 @@ reviewbuddy.startReviewCreation = function() {
 }
 
 /**
- * Creates the data that we can send to Crucible in order to add a revision
+ * Creates the data that we can send to Crucible in order to add a changeset
  * to a review.
  */
-reviewbuddy.createRevisionAddData = function(changesetId) {
+reviewbuddy.createChangesetAddData = function(changesetId) {
 	return "csid=" + changesetId + "&command=add";
 }
 
 /**
  * Adds a single changeset to a review.
- * 
- * The revision edit URL is expected to already specify the review id.
  */
-reviewbuddy.addChangesetToReview = function(revisionEditUrl, changesetId) {
-	var data = reviewbuddy.createRevisionAddData(changesetId);
-	$.post(revisionEditUrl, data, reviewbuddy.onRevisionAdded);
+reviewbuddy.addChangesetToReview = function(changesetEditUrl, changesetId, reviewId) {
+	var data = reviewbuddy.createChangesetAddData(changesetId);
+	$.post(changesetEditUrl, data, function(data) { reviewbuddy.onChangesetAdded(data, reviewId); });
 }
 
-reviewbuddy.onRevisionAdded = function(data) {
+reviewbuddy.onChangesetAdded = function(data, reviewId) {
 	reviewbuddy.global.changesetsAdded++;
 	
 	if(reviewbuddy.global.changesetsAdded >= reviewbuddy.global.changesetsNum) {
-		alert("done!");
+		reviewbuddy.onAllChangesetsAdded(reviewId);
 	}
+}
+
+reviewbuddy.createReviewUrl = function(reviewId) {
+	return reviewbuddy.config.crucible.reviewBaseUrl + "/" + reviewId;
+}
+
+reviewbuddy.redirectToReviewUrl = function(reviewId) {
+	window.location.replace(reviewbuddy.createReviewUrl(reviewId));
+}
+
+/**
+ * Called after all changesets have been added to a review.
+ */
+reviewbuddy.onAllChangesetsAdded = function(reviewId) {
+	reviewbuddy.redirectToReviewUrl(reviewId);
 }
 
 /**
@@ -165,14 +178,14 @@ reviewbuddy.addChangesetsToReview = function(changesets, reviewId) {
 		return;
 	}
 	
-	var revisionEditUrl = reviewbuddy.createRevisionEditUrl(reviewId);
+	var changesetEditUrl = reviewbuddy.createChangesetEditUrl(reviewId);
 	
 	// reset number of changesets added and to be added
 	reviewbuddy.global.changesetsAdded = 0;
 	reviewbuddy.global.changesetsNum = changesets.length;
 	
 	for(changesetId in changesets) {
-		reviewbuddy.addChangesetToReview(revisionEditUrl, changesetId);
+		reviewbuddy.addChangesetToReview(changesetEditUrl, changesetId, reviewId);
 	}
 }
 
