@@ -223,17 +223,18 @@ reviewbuddy.onAllChangesetsAdded = function(reviewId) {
  */
 reviewbuddy.getSourceNameFromUrl = function() {
 	var parts = window.location.href.split("/");
-	
 	if(null == parts || 0 == parts.length) {
 		return "";
 	}
 	
-	var page = parts[parts.length - 1];
+	// Handle case that URL ends with a slash
+	var page = parts[parts.length - 1] || parts[parts.length - 2];
 	if(!page) {
 		return "";
 	}
 	
-	return page.substring(0, page.indexOf("?"));
+	// Handle case that URL doesn't have a question mark
+	return page.substring(0, page.indexOf("?")) || page;
 }
 
 /**
@@ -253,6 +254,7 @@ reviewbuddy.addChangesetsToReview = function(changesets, reviewId) {
 	
 	var sourceName = reviewbuddy.getSourceName();
 	if(!sourceName) {
+		alert("Couldn't find project name.");
 		return;
 	}
 	
