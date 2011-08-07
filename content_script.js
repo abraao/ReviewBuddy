@@ -62,19 +62,45 @@ reviewbuddy.changesetFromLink = function(link) {
 	return null;
 }
 
+reviewbuddy.changesetFromInput = function(input) {
+	if(null != input) {
+		return input.value;
+	}
+	
+	return null;
+}
+
 /**
- * Returns all the changesets in the page.
+ * Get changesets identified by a link's CSS class.
+ * 
+ * changesetSelector - A string representing a CSS selector
+ * changesetIdExtrator - A function that take an element selected
+ * 	by the selector and returns the changeset id.
  */
-reviewbuddy.getChangsets = function() {
-	var changesetLinks = $("a.changeset-link");
+reviewbuddy.getChangesets = function(changesetSelector, changesetIdExtrator) {
+	var changesetLinks = $(changesetSelector);
 
 	if((null == changesetLinks) || (0 == changesetLinks.length)) {
 		return [];
 	}
 
 	return $.map(changesetLinks, function(elt, idx) {
-		return reviewbuddy.changesetFromLink(elt);
+		return changesetIdExtrator(elt);
 	});
+}
+
+/**
+ * Returns all the changesets in the page.
+ */
+reviewbuddy.getChangsets = function() {
+	// We need to try different approaches depending on the version of Fisheye.
+	var changesets = reviewbuddy.getChangesets("a.changeset-link", reviewbuddy.changesetFromLink);
+	
+	if(0 == changesets.length) {
+		changesets = reviewbuddy.getChangesets("input.csid", reviewbuddy.changesetFromInput);
+	}
+	
+	return changesets;
 }
 
 /**
@@ -202,7 +228,12 @@ reviewbuddy.getSourceNameFromUrl = function() {
 		return "";
 	}
 	
-	return parts[parts.length - 1];
+	var page = parts[parts.length - 1];
+	if(!page) {
+		return "";
+	}
+	
+	return page.substring(0, page.indexOf("?"));
 }
 
 /**
