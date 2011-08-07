@@ -144,15 +144,16 @@ reviewbuddy.startReviewCreation = function() {
  * Creates the data that we can send to Crucible in order to add a changeset
  * to a review.
  */
-reviewbuddy.createChangesetAddData = function(changesetId) {
-	return "csid=" + changesetId + "&command=add";
+reviewbuddy.createChangesetAddData = function(changesetId, sourceName) {
+	return "csid=" + changesetId + "&command=add&attachMethod=ITERATION&sourceName=" + sourceName;
 }
 
 /**
  * Adds a single changeset to a review.
  */
-reviewbuddy.addChangesetToReview = function(changesetEditUrl, changesetId, reviewId) {
-	var data = reviewbuddy.createChangesetAddData(changesetId);
+reviewbuddy.addChangesetToReview = function(changesetEditUrl, changesetId, reviewId, sourceName) {
+	var data = reviewbuddy.createChangesetAddData(changesetId, sourceName);
+
 	$.post(changesetEditUrl, data, function(data) { reviewbuddy.onChangesetAdded(data, reviewId); });
 }
 
@@ -180,10 +181,35 @@ reviewbuddy.onAllChangesetsAdded = function(reviewId) {
 }
 
 /**
+ * Try to get the source name from the URL.
+ */
+reviewbuddy.getSourceNameFromUrl = function() {
+	var parts = window.location.href.split("/");
+	
+	if(null == parts || 0 == parts.length) {
+		return "";
+	}
+	
+	return parts[parts.length - 1];
+}
+
+/**
+ * Get the source name from the page. I think this is like a project name.
+ */
+reviewbuddy.getSourceName = function() {
+	return reviewbuddy.getSourceNameFromUrl();
+}
+
+/**
  * Adds an array of changesets to a review.
  */
 reviewbuddy.addChangesetsToReview = function(changesets, reviewId) {
 	if(!reviewId || !$.isArray(changesets)) {
+		return;
+	}
+	
+	var sourceName = reviewbuddy.getSourceName();
+	if(!sourceName) {
 		return;
 	}
 	
@@ -192,7 +218,7 @@ reviewbuddy.addChangesetsToReview = function(changesets, reviewId) {
 	reviewbuddy.global.resetState(changesets.length);
 	
 	for(ii in changesets) {
-		reviewbuddy.addChangesetToReview(changesetEditUrl, changesets[ii], reviewId);
+		reviewbuddy.addChangesetToReview(changesetEditUrl, changesets[ii], reviewId, sourceName);
 	}
 }
 
