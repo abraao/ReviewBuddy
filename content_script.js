@@ -154,7 +154,9 @@ reviewbuddy.createChangesetAddData = function(changesetId, sourceName) {
 reviewbuddy.addChangesetToReview = function(changesetEditUrl, changesetId, reviewId, sourceName) {
 	var data = reviewbuddy.createChangesetAddData(changesetId, sourceName);
 
-	$.post(changesetEditUrl, data, function(data) { reviewbuddy.onChangesetAdded(data, reviewId); });
+	var callback = function(data) { reviewbuddy.onChangesetAdded(data, reviewId); };
+	var xhr = $.post(changesetEditUrl, data, callback);
+	xhr.error(callback);
 }
 
 reviewbuddy.onChangesetAdded = function(data, reviewId) {
