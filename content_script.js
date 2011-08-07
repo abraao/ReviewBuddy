@@ -4,9 +4,19 @@ var reviewbuddy = {};
  * Configuration
  *****************************************************************************/
 
+reviewbuddy.getCurrentPageBaseUrl = function () {
+	var parts = window.location.href.split("/");
+
+	if(parts.length >= 3) {
+		return "http://" + parts[2];
+	}
+
+	return "";
+}
+
 reviewbuddy.config = {};
 reviewbuddy.config.crucible = {};
-reviewbuddy.config.crucible.baseUrl = "http://sandbox.fisheye.atlassian.com";
+reviewbuddy.config.crucible.baseUrl = reviewbuddy.getCurrentPageBaseUrl();
 reviewbuddy.config.crucible.reviewBaseUrl = reviewbuddy.config.crucible.baseUrl + "/cru";
 reviewbuddy.config.crucible.jsonApi = reviewbuddy.config.crucible.baseUrl + "/json/cru";
 reviewbuddy.config.crucible.createReviewUrl = reviewbuddy.config.crucible.jsonApi + "/createReviewDialog";
