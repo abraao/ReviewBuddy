@@ -1,5 +1,5 @@
 #!/bin/bash
-rm ReviewBuddy.tar.bz2
+rm ReviewBuddy.zip
 echo "Cleaned up old compressed file"
 
 mkdir ReviewBuddy
@@ -11,7 +11,7 @@ cp *.html ReviewBuddy/
 cp *.png ReviewBuddy/
 echo "Copied all files"
 
-tar cjf ReviewBuddy.tar.bz2 ReviewBuddy/
+zip -R ReviewBuddy.zip ReviewBuddy/*
 echo "Created compressed file"
 
 rm -rf ReviewBuddy/
