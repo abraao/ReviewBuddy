@@ -27,7 +27,7 @@ reviewbuddy.options.loadSingleOption = function(optionId, optionValue) {
 	var optionTag = $("#" + optionId);
 	
 	if(0 == optionTag.length) {
-		alert("Error loading " + optionId);
+		reviewbuddy.options.displayMessage("error", "Error loading option " + optionId + ": option field not on page.");
 		return;
 	}
 	
@@ -38,12 +38,12 @@ reviewbuddy.options.saveOptions = function() {
 	var options = $(".option");
 	
 	if(null == options || 0 == options.length) {
-		alert("No options to save.");
+		reviewbuddy.options.displayMessage("warning", "No options to save.");
 		return;
 	}
 	
 	$.each(options, function(ii, option) { reviewbuddy.options.saveSingleOption(option); });
-	alert("Options saved");
+	reviewbuddy.options.displayMessage("success", "Options saved.");
 }
 
 reviewbuddy.options.saveSingleOption = function(option) {
@@ -53,6 +53,10 @@ reviewbuddy.options.saveSingleOption = function(option) {
 	else {
 		localStorage[option.id] = option.value;
 	}
+}
+
+reviewbuddy.options.displayMessage = function(messageClass, messageText) {
+	$("<p>").addClass(messageClass).append(messageText).appendTo($("#messageContainer"));
 }
 
 reviewbuddy.options.pageSetup();
