@@ -3,6 +3,7 @@
 	"version": "1.0",
 	"description": "Your Crucible and Fisheye companion.",
 	"background_page": "background.html",
+	"options_page": "options/options.html",
 	"permissions": ["tabs", "http://*/*"],
 	"browser_action": {
 		"name": "Create a review",
