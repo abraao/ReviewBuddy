@@ -154,7 +154,8 @@ reviewbuddy.getChangsets = function() {
  * Calls the callback, passing in the review id (if successful), or an empty string (on failure).
  */
 reviewbuddy.createReview = function(callback) {
-	$.post(reviewbuddy.config.crucible.createReviewUrl, function(data) { reviewbuddy.onReviewCreated(data, callback); });
+	var message = reviewbuddy.appendOptionValueToMessage("", "projectKey");
+	$.post(reviewbuddy.config.crucible.createReviewUrl, message, function(data) { reviewbuddy.onReviewCreated(data, callback); });
 }
 
 /**
@@ -215,11 +216,7 @@ reviewbuddy.createChangesetEditUrl = function(reviewId) {
  * to a review.
  */
 reviewbuddy.createChangesetAddData = function(changesetId, sourceName) {
-	var addMessage = "csid=" + changesetId + "&command=add&attachMethod=ITERATION&sourceName=" + sourceName;
-	
-	addMessage = reviewbuddy.appendOptionValueToMessage(addMessage, "projectKey");
-	
-	return addMessage;
+	return "csid=" + changesetId + "&command=add&attachMethod=ITERATION&sourceName=" + sourceName;
 }
 
 /**
@@ -230,8 +227,14 @@ reviewbuddy.createChangesetAddData = function(changesetId, sourceName) {
 reviewbuddy.appendOptionValueToMessage = function(message, optionId) {
 	var optionValue = reviewbuddy.options.getOptionValue(optionId);
 
-	if(optionValue && (undefined == optionValue)) {
-		return message + "&" + optionId + "=" + optionValue;
+	if(optionValue && (undefined != optionValue)) {
+		var newMessage = message;
+		
+		if(message) {
+			newMessage = newMessage + "&";
+		}
+		
+		return newMessage + optionId + "=" + optionValue;
 	}
 
 	return message;
