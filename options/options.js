@@ -1,7 +1,7 @@
 var reviewbuddy = {};
 reviewbuddy.options = {};
 
-reviewbuddy.options.pageSetup = function() {
+reviewbuddy.options.setup = function() {
 	$(document).ready(function() {
 		reviewbuddy.options.loadOptions();
 		
@@ -59,4 +59,4 @@ reviewbuddy.options.displayMessage = function(messageClass, messageText) {
 	$("<p>").addClass(messageClass).append(messageText).appendTo($("#messageContainer"));
 }
 
-reviewbuddy.options.pageSetup();
+reviewbuddy.options.setup();

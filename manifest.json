@@ -2,7 +2,7 @@
 	"name": "Review Buddy",
 	"version": "1.0",
 	"description": "Your Crucible and Fisheye companion.",
-	"background_page": "background.html",
+	"background_page": "background/background.html",
 	"options_page": "options/options.html",
 	"permissions": ["tabs", "http://*/*"],
 	"browser_action": {

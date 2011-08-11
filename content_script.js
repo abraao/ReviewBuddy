@@ -47,8 +47,53 @@ reviewbuddy.global.resetState = function(changesetsNum) {
 }
 
 /*****************************************************************************
+ * Options
+ *****************************************************************************/
+reviewbuddy.options = {};
+
+/**
+ * Returns the option value. If the option doesn't exist or has no value,
+ * returns an empty string.
+ */
+reviewbuddy.options.fetchSingleOption = function(optionId, callback) {
+	chrome.extension.sendRequest({optionId: "projectKey"}, function(response) {
+		callback(optionId, response[optionId]);
+	});
+}
+
+/**
+ * Loads all our options into variables.
+ */
+reviewbuddy.options.fetchOptions = function() {
+	reviewbuddy.options.fetchSingleOption("projectKey", reviewbuddy.options.storeOption);
+}
+
+reviewbuddy.options.storeOption = function(optionId, optionValue) {
+	if(optionValue) {
+		localStorage[optionId] = optionValue;
+	}
+}
+
+reviewbuddy.options.getOptionValue = function(optionId) {
+	return localStorage[optionId];
+}
+
+/*****************************************************************************
  * Implementation
  *****************************************************************************/
+
+reviewbuddy.startReviewCreation = function() {
+	var changesets = reviewbuddy.getChangsets();
+	
+	if(0 == changesets) {
+		alert("Cannot create review. No changesets on page.");
+		return;
+	}
+
+	reviewbuddy.options.fetchOptions();
+
+	reviewbuddy.createReview(function(reviewId) { reviewbuddy.addChangesetsToReview(changesets, reviewId); });
+}
 
 /**
  * Given a link, return the changeset id to which it corresponds.
@@ -165,23 +210,31 @@ reviewbuddy.createChangesetEditUrl = function(reviewId) {
 	return reviewbuddy.config.crucible.jsonApi + "/" + reviewId + reviewbuddy.config.crucible.changesetAdd;
 }
 
-reviewbuddy.startReviewCreation = function() {
-	var changesets = reviewbuddy.getChangsets();
-	
-	if(0 == changesets) {
-		alert("Cannot create review. No changesets on page.");
-		return;
-	}
-
-	reviewbuddy.createReview(function(reviewId) { reviewbuddy.addChangesetsToReview(changesets, reviewId); });
-}
-
 /**
  * Creates the data that we can send to Crucible in order to add a changeset
  * to a review.
  */
 reviewbuddy.createChangesetAddData = function(changesetId, sourceName) {
-	return "csid=" + changesetId + "&command=add&attachMethod=ITERATION&sourceName=" + sourceName;
+	var addMessage = "csid=" + changesetId + "&command=add&attachMethod=ITERATION&sourceName=" + sourceName;
+	
+	addMessage = reviewbuddy.appendOptionValueToMessage(addMessage, "projectKey");
+	
+	return addMessage;
+}
+
+/**
+ * Adds the value of the specified option to the given message and returns it.
+ * If the option doesn't exist or doesn't have a value, the message
+ * is returned unchanged.
+ */
+reviewbuddy.appendOptionValueToMessage = function(message, optionId) {
+	var optionValue = reviewbuddy.options.getOptionValue(optionId);
+
+	if(optionValue && (undefined == optionValue)) {
+		return message + "&" + optionId + "=" + optionValue;
+	}
+
+	return message;
 }
 
 /**

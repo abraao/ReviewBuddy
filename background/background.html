@@ -1,14 +1,16 @@
 <html>
 	<head>
-		<script>
+		<script type="text/javascript">
 			chrome.browserAction.onClicked.addListener( function(tab) {
 				chrome.tabs.executeScript(null, {
 					file: "jquery.js"
 				});
+
 				chrome.tabs.executeScript(null, {
 					file: "content_script.js"
 				});
 			});
 		</script>
+		<script type="text/javascript" src="background.js"></script>
 	</head>
 </html>
