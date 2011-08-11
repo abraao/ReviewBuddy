@@ -7,11 +7,12 @@ echo "Created directory"
 
 cp *.js ReviewBuddy/
 cp *.json ReviewBuddy/
-cp *.html ReviewBuddy/
 cp *.png ReviewBuddy/
+cp -R background ReviewBuddy/
+cp -R options ReviewBuddy/
 echo "Copied all files"
 
-zip -R ReviewBuddy.zip ReviewBuddy/*
+zip -r ReviewBuddy.zip ReviewBuddy/*
 echo "Created compressed file"
 
 rm -rf ReviewBuddy/
