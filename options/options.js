@@ -43,7 +43,7 @@ reviewbuddy.options.saveOptions = function() {
 	}
 	
 	$.each(options, function(ii, option) { reviewbuddy.options.saveSingleOption(option); });
-	reviewbuddy.options.displayMessage("success", "Options saved.");
+	reviewbuddy.options.flashMessage("success", "Options saved.");
 }
 
 reviewbuddy.options.saveSingleOption = function(option) {
@@ -55,8 +55,19 @@ reviewbuddy.options.saveSingleOption = function(option) {
 	}
 }
 
+reviewbuddy.options.flashMessage = function(messageClass, messageText) {
+	reviewbuddy.options.displayMessage(messageClass, messageText);
+	
+	setTimeout(reviewbuddy.options.clearMessages, 3000);
+}
+
 reviewbuddy.options.displayMessage = function(messageClass, messageText) {
+	reviewbuddy.options.clearMessages();
 	$("<p>").addClass(messageClass).append(messageText).appendTo($("#messageContainer"));
+}
+
+reviewbuddy.options.clearMessages = function() {
+	$("#messageContainer").empty();
 }
 
 reviewbuddy.options.setup();
