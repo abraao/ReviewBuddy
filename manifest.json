@@ -5,8 +5,7 @@
 	"background_page": "background/background.html",
 	"options_page": "options/options.html",
 	"permissions": ["tabs", "http://*/*"],
-	"browser_action": {
-		"name": "Create a review",
+	"page_action": {
 		"default_icon": "icon.png",
 		"default_title": "Review Buddy"
 	}

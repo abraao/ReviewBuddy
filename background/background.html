@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<script type="text/javascript">
-			chrome.browserAction.onClicked.addListener( function(tab) {
+			chrome.pageAction.onClicked.addListener(function(tab) {
 				chrome.tabs.executeScript(null, {
 					file: "jquery.js"
 				});
@@ -9,6 +9,12 @@
 				chrome.tabs.executeScript(null, {
 					file: "content_script.js"
 				});
+			});
+
+			chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+				if(/fisheye/.test(tab.url)) {
+					chrome.pageAction.show(tabId);
+				}
 			});
 		</script>
 		<script type="text/javascript" src="background.js"></script>
