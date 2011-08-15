@@ -83,8 +83,8 @@ reviewbuddy.options.getOptionValue = function(optionId) {
  *****************************************************************************/
 
 reviewbuddy.startReviewCreation = function() {
-	var changesets = reviewbuddy.getChangsets();
-	
+	var changesets = reviewbuddy.getAllChangesets();
+
 	if(0 == changesets) {
 		alert("Cannot create review. No changesets on page.");
 		return;
@@ -137,7 +137,7 @@ reviewbuddy.getChangesets = function(changesetSelector, changesetIdExtrator) {
 /**
  * Returns all the changesets in the page.
  */
-reviewbuddy.getChangsets = function() {
+reviewbuddy.getAllChangesets = function() {
 	// We need to try different approaches depending on the version of Fisheye.
 	var changesets = reviewbuddy.getChangesets("a.changeset-link", reviewbuddy.changesetFromLink);
 	
