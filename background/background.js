@@ -15,4 +15,24 @@ reviewbuddy.options.dispatchRequest = function(request, sender, sendResponse) {
 	}
 }
 
-chrome.extension.onRequest.addListener(reviewbuddy.options.dispatchRequest);
+reviewbuddy.setUpListeners = function() {
+	chrome.extension.onRequest.addListener(reviewbuddy.options.dispatchRequest);
+	
+	chrome.pageAction.onClicked.addListener(function(tab) {
+		chrome.tabs.executeScript(null, {
+			file: "jquery.js"
+		});
+	
+		chrome.tabs.executeScript(null, {
+			file: "content_script.js"
+		});
+	});
+	
+	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+		if(/fisheye/.test(tab.url)) {
+			chrome.pageAction.show(tabId);
+		}
+	});
+}
+
+reviewbuddy.setUpListeners();
