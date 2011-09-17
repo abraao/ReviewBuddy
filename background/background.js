@@ -15,10 +15,7 @@ reviewbuddy.options.dispatchRequest = function(request, sender, sendResponse) {
 	}
 }
 
-reviewbuddy.setUpListeners = function() {
-	chrome.extension.onRequest.addListener(reviewbuddy.options.dispatchRequest);
-	
-	chrome.pageAction.onClicked.addListener(function(tab) {
+reviewbuddy.injectContentScripts = function() {
 		chrome.tabs.executeScript(null, {
 			file: "jquery.js"
 		});
@@ -26,8 +23,11 @@ reviewbuddy.setUpListeners = function() {
 		chrome.tabs.executeScript(null, {
 			file: "content_script.js"
 		});
-	});
-	
+}
+
+reviewbuddy.setUpListeners = function() {
+	chrome.extension.onRequest.addListener(reviewbuddy.options.dispatchRequest);
+
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 		if(/fisheye/.test(tab.url)) {
 			chrome.pageAction.show(tabId);
@@ -36,3 +36,4 @@ reviewbuddy.setUpListeners = function() {
 }
 
 reviewbuddy.setUpListeners();
+
