@@ -271,7 +271,12 @@ reviewbuddy.redirectToReviewUrl = function(reviewId) {
  * Called after all changesets have been added to a review.
  */
 reviewbuddy.onAllChangesetsAdded = function(reviewId) {
+	reviewbuddy.closePopup();
 	reviewbuddy.redirectToReviewUrl(reviewId);
+}
+
+reviewbuddy.closePopup = function() {
+	chrome.extension.sendRequest({popupClose: true}, function(response){});
 }
 
 /**
